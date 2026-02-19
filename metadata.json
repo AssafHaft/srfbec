@@ -1,0 +1,5 @@
+{
+  "name": "Billabong Utility Calculator",
+  "description": "A specialized utility billing calculator for SurfparkTLV tenants.",
+  "requestFramePermissions": []
+}
