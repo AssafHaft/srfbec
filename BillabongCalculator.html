@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Surf Park Utility CP - V2</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: #f4f7f6;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            background-color: #fff;
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            width: 100%;
+            max-width: 450px;
+        }
+        h2 { text-align: center; color: #333; margin-bottom: 0.5rem; }
+        h3 { text-align: center; color: #0071e3; margin-bottom: 1.5rem; font-size: 1.1em; }
+        .form-group { margin-bottom: 1.2rem; }
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #444;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+        input[type="number"] {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            box-sizing: border-box;
+            font-size: 16px;
+            transition: border-color 0.2s;
+        }
+        input:focus {
+            border-color: #0071e3;
+            outline: none;
+        }
+        button {
+            width: 100%;
+            padding: 1rem;
+            border: none;
+            border-radius: 6px;
+            background-color: #28a745; /* Green for "Calculate" */
+            color: white;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 1rem;
+        }
+        button:hover { background-color: #218838; }
+        #result-area {
+            margin-top: 1.5rem;
+            padding: 1.5rem;
+            background-color: #f8f9fa;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            text-align: center;
+            display: none;
+        }
+        .final-amount {
+            font-size: 32px;
+            font-weight: bold;
+            color: #28a745;
+            margin: 10px 0;
+        }
+        .breakdown {
+            font-size: 0.85rem;
+            color: #666;
+            text-align: left;
+            border-top: 1px solid #ddd;
+            padding-top: 10px;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>Utility Control Panel</h2>
+    <h3>Billabong Store Invoice</h3>
+    
+    <div class="form-group">
+        <label>1. Total Park Bill (KW)</label>
+        <input type="number" id="totalKW" placeholder="Main Meter Reading">
+    </div>
+
+    <div class="form-group">
+        <label>2. Total Park Bill (NIS)</label>
+        <input type="number" id="totalNIS" placeholder="Total Invoice Amount">
+    </div>
+
+    <div class="form-group">
+        <label>3. Wave Machine Reading (KW)</label>
+        <input type="number" id="machineKW" placeholder="Sub-meter for Machine">
+    </div>
+
+    <div class="form-group" style="background: #fff9db; padding: 10px; border-radius: 6px; border: 1px dashed #f08c00;">
+        <label style="color: #e67e22;">4. Billabong Cabinet Reading (KW)</label>
+        <input type="number" id="billabongCabinetKW" placeholder="Store Meter Reading">
+    </div>
+
+    <button onclick="calculateBill()">Generate Invoice Amount</button>
+
+    <div id="result-area">
+        <label>Total to Invoice Billabong:</label>
+        <div class="final-amount" id="finalResult">₪0.00</div>
+        
+        <div class="breakdown" id="breakdownText">
+            </div>
+    </div>
+</div>
+
+<script>
+    const PARK_AIRCON_RATIO = 0.70; 
+    const BILLABONG_AC_SHARE_RATIO = 0.068;
+
+    function calculateBill() {
+        const totalKW = parseFloat(document.getElementById('totalKW').value) || 0;
+        const totalNIS = parseFloat(document.getElementById('totalNIS').value) || 0;
+        const machineKW = parseFloat(document.getElementById('machineKW').value) || 0;
+        const cabinetKW = parseFloat(document.getElementById('billabongCabinetKW').value) || 0;
+
+        if (totalKW <= 0 || totalNIS <= 0) {
+            alert("Please enter the main bill totals.");
+            return;
+        }
+
+        // Logic
+        const costPerKW = totalNIS / totalKW;
+        const generalParkKW = totalKW - machineKW;
+        const totalAirconKW = generalParkKW * PARK_AIRCON_RATIO;
+        const billabongACShareKW = totalAirconKW * BILLABONG_AC_SHARE_RATIO;
+        
+        // Summing the Cabinet + the AC Share
+        const totalBillabongKW = cabinetKW + billabongACShareKW;
+        const finalNIS = totalBillabongKW * costPerKW;
+
+        // Display
+        const resultDiv = document.getElementById('result-area');
+        const finalAmountSpan = document.getElementById('finalResult');
+        const breakdownDiv = document.getElementById('breakdownText');
+
+        let formatter = new Intl.NumberFormat('he-IL', {
+            style: 'currency',
+            currency: 'ILS'
+        });
+
+        finalAmountSpan.textContent = formatter.format(finalNIS);
+        
+        breakdownDiv.innerHTML = `
+            <strong>Calculation Breakdown:</strong><br>
+            • Rate: ${costPerKW.toFixed(4)} NIS/KW<br>
+            • Direct Cabinet: ${cabinetKW.toLocaleString()} KW<br>
+            • Estimated AC Share: ${billabongACShareKW.toFixed(2)} KW<br>
+            • <strong>Total Consumption: ${totalBillabongKW.toFixed(2)} KW</strong>
+        `;
+
+        resultDiv.style.display = 'block';
+    }
+</script>
+
+</body>
+</html>
