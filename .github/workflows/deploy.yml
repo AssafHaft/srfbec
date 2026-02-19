@@ -28,6 +28,12 @@ jobs:
         run: npm install --legacy-peer-deps
       - name: Debug - List files
         run: ls -la
+      - name: Ensure index.html exists
+        run: |
+          if [ ! -f index.html ]; then
+            echo "index.html missing, creating it..."
+            echo '<!doctype html><html lang="en"><head><meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1.0" /><title>Billabong Utility Calculator</title></head><body><div id="root"></div><script type="module" src="/src/main.tsx"></script></body></html>' > index.html
+          fi
       - name: Build
         run: CI=false npm run build
       - name: Upload artifact
