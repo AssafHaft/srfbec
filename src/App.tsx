@@ -34,10 +34,10 @@ export default function App() {
 
     const rate = tNIS / tKW;
     const parkGeneralKW = tKW - mKW;
-    // 70% of the base park consumption is the AC pool
-    const totalAcKW = parkGeneralKW * 0.70; 
-    // Billabong pays for 6.8% of the AC pool
-    const bShareAcKW = totalAcKW * 0.068; 
+    // 50% of the base park consumption is the AC pool
+    const totalAcKW = parkGeneralKW * 0.50; 
+    // Billabong pays for 3.4% of the AC pool
+    const bShareAcKW = totalAcKW * 0.034; 
     
     const totalBilledKW = bKW + bShareAcKW;
     const finalNIS = totalBilledKW * rate;
@@ -140,7 +140,7 @@ export default function App() {
                 <span className="font-medium">{result.directKW.toLocaleString()} KW</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-[#86868b]">AC Share (6.8%)</span>
+                <span className="text-[#86868b]">AC Share (3.4%)</span>
                 <span className="font-medium">{result.acShareKW.toFixed(2)} KW</span>
               </div>
               <div className="flex justify-between pt-2 font-semibold border-t border-[#d2d2d7]/50 mt-2">
